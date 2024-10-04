@@ -1,0 +1,8 @@
+{
+  "name": "Dynamic Content Importer",
+  "id": "dynamic-content-importer",
+  "editorType": ["figma"],
+  "main": "code.js",
+  "ui": "ui.html",
+  "api": "1.0.0"  
+}

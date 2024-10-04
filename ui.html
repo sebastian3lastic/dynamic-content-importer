@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Content Importer</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 400px;
+      height: 360px; /* Aumentar el alto del área de texto */
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 11px;
+      resize: none;
+      outline: none;
+    }
+
+    textarea::placeholder {
+      color: #999;
+    }
+
+    .button {
+      margin-top: 20px;
+      padding: 15px 30px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 200;
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .button:hover {
+      background-color: #103055;
+    }
+
+    .button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Sincronizar items listActivity</h2>
+    <textarea id="data-input" placeholder="Pega tus datos de DataSetFigma aquí..."></textarea>
+    <button id="import-btn" class="button">Importar Datos</button>
+    <div id="status-message"></div>
+  </div>
+
+  <script>
+    const button = document.getElementById('import-btn');
+    const statusMessage = document.getElementById('status-message');
+
+    button.onclick = () => {
+      button.disabled = true;
+      statusMessage.innerHTML = '';
+
+      const pastedData = document.getElementById('data-input').value;
+
+      // Enviar los datos al plugin
+      parent.postMessage({ pluginMessage: { type: 'import-data', content: pastedData } }, '*');
+    };
+
+    // Escuchar mensajes del plugin para mostrar éxito o error
+    window.onmessage = (event) => {
+      const message = event.data.pluginMessage;
+      
+      if (message === 'success') {
+        statusMessage.innerHTML = '<p style="color:green;">Datos importados con éxito.</p>';
+      } else if (message === 'error') {
+        statusMessage.innerHTML = '<p style="color:red;">Hubo un error al importar los datos.</p>';
+      }
+      
+      button.disabled = false; // Habilitar el botón nuevamente
+    };
+  </script>
+</body>
+</html>
