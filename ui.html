@@ -30,7 +30,7 @@
     textarea {
       width: 100%;
       max-width: 400px;
-      height: 360px; /* Aumentar el alto del área de texto */
+      height: 360px;
       padding: 12px;
       border-radius: 4px;
       border: 1px solid #ccc;
@@ -67,6 +67,26 @@
       background-color: #cccccc;
       cursor: not-allowed;
     }
+
+    .status-message {
+      font-size: 12px;
+      background-color: #fff9c4;
+      padding: 10px;
+      width: 100%;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
   </style>
 </head>
 <body>
@@ -83,25 +103,35 @@
 
     button.onclick = () => {
       button.disabled = true;
+      button.innerText = 'Sincronizando datos...';
       statusMessage.innerHTML = '';
 
       const pastedData = document.getElementById('data-input').value;
 
       // Enviar los datos al plugin
-      parent.postMessage({ pluginMessage: { type: 'import-data', content: pastedData } }, '*');
+      parent.postMessage({ pluginMessage: { type: 'update-layers', data: pastedData } }, '*');
     };
 
     // Escuchar mensajes del plugin para mostrar éxito o error
     window.onmessage = (event) => {
       const message = event.data.pluginMessage;
-      
-      if (message === 'success') {
-        statusMessage.innerHTML = '<p style="color:green;">Datos importados con éxito.</p>';
-      } else if (message === 'error') {
-        statusMessage.innerHTML = '<p style="color:red;">Hubo un error al importar los datos.</p>';
+
+      if (message.status === 'syncing') {
+        statusMessage.innerHTML = '<p>Sincronizando datos...</p>';
+      } else if (message.status === 'success') {
+        statusMessage.innerHTML = '<p class="success">Datos importados con éxito.</p>';
+        button.innerText = 'Datos sincronizados';
+        button.style.backgroundColor = 'green';
+        setTimeout(() => {
+          button.disabled = false;
+          button.innerText = 'Importar Datos';
+          button.style.backgroundColor = '#1a73e8';
+        }, 2000);
+      } else if (message.status === 'error') {
+        statusMessage.innerHTML = '<p class="error">Hubo un error al importar los datos.</p>';
+        button.disabled = false;
+        button.innerText = 'Importar Datos';
       }
-      
-      button.disabled = false; // Habilitar el botón nuevamente
     };
   </script>
 </body>
